@@ -32,6 +32,18 @@
 // File mode: User has read/write, groupd has read/write, everyone has read permissions
 #define FILE_MODE S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH
 
+void print_and_log(int log_level, char* format, char* content)
+{
+    printf(format, content);
+    syslog(log_level, format, content);
+}
+
+void print_and_log2(int log_level, char* format, char* content1, char* content2)
+{
+    printf(format, content1, content2);
+    syslog(log_level, format, content1, content2);
+}
+
 int main(int argc, char *argv[])
 {
     // Setup logger
@@ -40,14 +52,14 @@ int main(int argc, char *argv[])
     // If missing writefile
     if (argc < 2)
     {
-        syslog(LOG_ERR, "%s", "Error: Missing writefile argument!");
+        print_and_log(LOG_ERR, "%s\n", "Error: Missing writefile argument!");
         return 1;
     }
 
     // If missing writestr
     if (argc < 3)
     {
-        syslog(LOG_ERR, "%s", "Error: Missing writestr argument!");
+        print_and_log(LOG_ERR, "%s\n", "Error: Missing writestr argument!");
         return 1;
     }
 
@@ -57,24 +69,24 @@ int main(int argc, char *argv[])
     // Check that file opened correctly
     if (file_descriptor == -1)
     {
-        syslog(LOG_ERR, "Error: Failed to open file '%s'!", argv[1]);
+        print_and_log(LOG_ERR, "Error: Failed to open file '%s'!\n", argv[1]);
         return 1;
     }
 
     // Log write
-    syslog(LOG_DEBUG, "Writing '%s' to '%s'", argv[2], argv[1]);
+    print_and_log2(LOG_DEBUG, "Writing '%s' to '%s'\n", argv[2], argv[1]);
 
     // Write contents to file
-    size_t write_length = strlen(argv[1]);
-    ssize_t bytes_written = write(file_descriptor, argv[1], write_length);
+    size_t write_length = strlen(argv[2]);
+    ssize_t bytes_written = write(file_descriptor, argv[2], write_length);
     if (bytes_written == -1)
     {
-        syslog(LOG_ERR, "Error: Failed to write to file '%s'!", argv[1]);
+        print_and_log(LOG_ERR, "Error: Failed to write to file '%s'!\n", argv[1]);
         return 1;
     }
     else if (bytes_written != write_length)
     {
-        syslog(LOG_ERR, "Error: Failed to write all content to file '%s'!", argv[1]);
+        print_and_log(LOG_ERR, "Error: Failed to write all content to file '%s'!\n", argv[1]);
         return 1;
     }
 
@@ -82,7 +94,7 @@ int main(int argc, char *argv[])
     int close_return = close(file_descriptor);
     if (close_return == -1)
     {
-        syslog(LOG_ERR, "Error: Failed to close file '%s'!", argv[1]);
+        print_and_log(LOG_ERR, "Error: Failed to close file '%s'!\n", argv[1]);
         return 1;
     }
     
@@ -91,3 +103,4 @@ int main(int argc, char *argv[])
     
     return 0;
 }
+

@@ -13,10 +13,10 @@ CC=gcc
 
 writer: writer.o
 	@echo 'Building writer!'
-	$(CROSS_COMPILE)$(CC) -o writer writer.o
+	@$(CROSS_COMPILE)$(CC) -o writer writer.o
 
 writer.o : writer.c
-	$(CROSS_COMPILE)$(CC) -c writer.c
+	@$(CROSS_COMPILE)$(CC) -c writer.c
 
 clean : 
 	@echo 'Cleaning!'
