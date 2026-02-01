@@ -15,7 +15,7 @@
 */
 bool do_system(const char *cmd)
 {
-    printf("Executing: %s\n", cmd);
+    printf("  Executing: %s\n", cmd);
     int return_num = system(cmd);
 
     if (cmd == NULL)
@@ -65,7 +65,7 @@ bool do_exec(int count, ...)
 
     if (count < 1)
     {
-        printf("Error: do_exec() requires at least one argument besides count to work!");
+        printf("  Error: do_exec() requires at least one argument besides count to work!");
         return false;
     }
 
@@ -75,7 +75,7 @@ bool do_exec(int count, ...)
     const char * path = va_arg(args, char *);
     if(path[0] != '/')
     {
-        printf("Error: '%s' is not a absolute path!\n", path);
+        printf("  Error: '%s' is not a absolute path!\n", path);
         return false;
     }
 
@@ -87,7 +87,7 @@ bool do_exec(int count, ...)
         argument = va_arg(args, char *);
         if (argument[0] != '-' && argument[0] != '/')
         {
-            printf("Error: Argument '%s' is not expanded!\n", argument);
+            printf("  Error: Argument '%s' is not expanded!\n", argument);
             return false;
         }
         argv[i] = argument;
@@ -101,30 +101,30 @@ bool do_exec(int count, ...)
     int stat_returned = stat(path, &file_stat);
     if (stat_returned == -1)
     {
-        printf("Error: '%s' is not a valid path to a file to execute!\n", path);
+        printf("  Error: '%s' is not a valid path to a file to execute!\n", path);
         return false;
     }
 
     pid_t fork_pid = fork();
     if (fork_pid == -1)
     {
-        printf("Error: Failed to create child proccess!\n");
+        printf("  Error: Failed to create child proccess!\n");
         return false;
     }
     else if (fork_pid == 0)
     {
         // Child logic
-        printf("Child executing: %s", path);
+        printf("  Child executing: %s", path);
         for (int i = 0; argv[i] != NULL; i++) 
         {
-            printf(" %s", argv[i]);
+            printf("   %s", argv[i]);
         }
-        printf("\n");
+        printf("  \n");
 
         int execv_return = execv(path, (char * const*) argv);
         if (execv_return == -1)
         {
-            printf("Error child failed to run command\n");
+            printf("  Error child failed to run command\n");
             return false;
         }
     }
@@ -135,17 +135,17 @@ bool do_exec(int count, ...)
         pid_t waitpid_return = waitpid(fork_pid, &wstatus, WUNTRACED);
         if (waitpid_return == -1)
         {
-            printf("Error: Failed to wait for child %d!", fork_pid);
+            printf("  Error: Failed to wait for child %d!", fork_pid);
             return false;
         }
         else if (!WIFEXITED(wstatus))
         {
-            printf("Error: Child process did not exit normally\n");
+            printf("  Error: Child process did not exit normally\n");
             return false;
         }
         else if (WEXITSTATUS(wstatus) != 0)
         {
-            printf("Error: Child process did not return 0\n");
+            printf("  Error: Child process did not return 0\n");
             return false;
         }
     }
@@ -168,21 +168,21 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     int fd = open(outputfile, O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
     if (fd == -1)
     {
-        printf("Error: Failed to open file descriptor for %s\n", outputfile);
+        printf("  Error: Failed to open file descriptor for %s\n", outputfile);
         return false;
     }
 
     int dup_return = dup2(fd, 1);
     if (dup_return == -1)
     {
-        printf("Error: Failed to duplicated standard output to %s\n", outputfile);
+        printf("  Error: Failed to duplicated standard output to %s\n", outputfile);
         return false;
     }
 
     int close_return = close(fd);
     if (close_return == -1)
     {
-        printf("Error: Failed to close %s file\n", outputfile);
+        printf("  Error: Failed to close %s file\n", outputfile);
         return false;
     }
 
