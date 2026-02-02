@@ -85,12 +85,6 @@ bool do_exec(int count, ...)
             va_end(args);
             return false;
         }
-        else if (i > 0 && argument[0] != '-' && argument[0] != '/')
-        {
-            printf("  Error: Argument '%s' is not expanded!\n", argument);
-            va_end(args);
-            return false;
-        }
         command[i] = argument;
     }
     command[count] = NULL;
@@ -174,12 +168,6 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         else if (i == 0 && argument[0] != '/')
         {
             printf("  Error: File '%s' is not expanded!\n", argument);
-            va_end(args);
-            return false;
-        }
-        else if (i > 0 && argument[0] != '-' && argument[0] != '/')
-        {
-            printf("  Error: Argument '%s' is not expanded!\n", argument);
             va_end(args);
             return false;
         }
